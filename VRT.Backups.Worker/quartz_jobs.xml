@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<job-scheduling-data xmlns="http://quartznet.sourceforge.net/JobSchedulingData"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0">
+	<pre-processing-commands>
+		<!-- If you change job/trigger names, remove old ones to omit unwanted behaviour -->
+		<delete-jobs-in-group>*</delete-jobs-in-group>		
+		<delete-triggers-in-group>*</delete-triggers-in-group>
+	</pre-processing-commands>
+	<processing-directives>
+		<overwrite-existing-data>true</overwrite-existing-data>
+		<ignore-duplicates>true</ignore-duplicates>
+	</processing-directives>
+	<schedule>
+		<job>
+			<name>BackupAssetsDbJob</name>
+			<group>BackupAssetsDb</group>
+			<description>Backups VRT.Assets mssql database</description>
+			<job-type>VRT.Backups.Mssql.BackupJob, VRT.Backups.Mssql</job-type>
+			<durable>true</durable>
+			<recover>true</recover>
+			<job-data-map>
+				<entry>
+					<key>ConnectionString</key>
+					<value>Data Source=.\sql2;Initial Catalog=prod.Assets;Integrated Security=True;MultipleActiveResultSets=true;</value>
+				</entry>
+				<entry>
+					<key>BackupsDirectory</key>
+					<value>d:\Backups\TestDb</value>
+				</entry>
+				<entry>
+					<key>DatabaseName</key>
+					<value>[testDb]</value>
+				</entry>
+			</job-data-map>
+		</job>
+		<trigger>
+			<simple>
+				<name>BackupNowTrigger</name>
+				<group>BackupNowTrigger</group>
+				<job-name>BackupAssetsDbJob</job-name>
+				<job-group>BackupAssetsDb</job-group>
+				<start-time-seconds-in-future>10</start-time-seconds-in-future>				
+			</simple>
+		</trigger>		
+	</schedule>
+</job-scheduling-data>
