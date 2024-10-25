@@ -44,6 +44,11 @@ public sealed class BackupCleanupJob : IJob
 
     private int PerformCleanup(BackupCleanupJobOptions options)
     {
+        if (Directory.Exists(options.BackupsDirectoryPath) is false)
+        {
+            return 0;
+        }
+
         var minBackupCreationTime = _dateTimeService.UtcNow.AddDays(-options.RetentionDays);
         var toDelete = Directory
             .EnumerateFiles(options.BackupsDirectoryPath, options.SearchPattern, SearchOption.TopDirectoryOnly)
