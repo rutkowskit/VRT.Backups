@@ -9,4 +9,11 @@ public static class JobExecutionContextExtensions
         var result = context.MergedJobDataMap.GetString(key);
         return result ?? Result.Failure<string>($"{key} not found in data map");
     }
+
+    public static Result<T> Get<T>(this IJobExecutionContext context, string key)
+    {
+        return context.MergedJobDataMap.TryGetValue(key, out var value) && value is T t
+            ? Result.Success(t)
+            : Result.Failure<T>($"{key} not found in data map");
+    }
 }

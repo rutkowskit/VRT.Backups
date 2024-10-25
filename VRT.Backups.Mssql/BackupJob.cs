@@ -1,6 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
+using Microsoft.Data.SqlClient;
 using Quartz;
-using System.Data.SqlClient;
 using System.Text;
 using VRT.Backups.Abstractions;
 using VRT.Backups.Application.Abstractions;
@@ -12,7 +12,8 @@ public sealed class BackupJob : IJob
     private readonly IDateTimeService _dateTimeService;
     private readonly INotificationService _notificationService;
 
-    public BackupJob(IDateTimeService dateTimeService,
+    public BackupJob(
+        IDateTimeService dateTimeService,
         INotificationService notificationService)
     {
         _dateTimeService = dateTimeService;
@@ -56,6 +57,7 @@ public sealed class BackupJob : IJob
         var result = context
             .GetString(Constants.DatabaseName)
             .BindJoin(_ => context.GetString(Constants.BackupsDirectory))
+            .Tap(t => CreateBackupDirectoryIfNotExists(t.Item2))
             .Tap(db => cmd.Append($"BACKUP DATABASE {db.Item1} "))
             .Tap(db => cmd.AppendLine($"TO DISK = '{GetBackupFileName(db)}' "))
             .Tap(db => cmd.AppendLine($"WITH FORMAT,MEDIANAME='{db.Item1}Backups', "))
@@ -67,5 +69,13 @@ public sealed class BackupJob : IJob
     {
         var fileName = $"{@params.DbName}_full_{_dateTimeService.UtcNow:yyyyMMdd_HHmmss}.bak";
         return Path.Combine(@params.BackupsDirectory, fileName);
+    }
+    private static void CreateBackupDirectoryIfNotExists(string backupsDirectory)
+    {
+        if (Directory.Exists(backupsDirectory))
+        {
+            return;
+        }
+        Directory.CreateDirectory(backupsDirectory);
     }
 }

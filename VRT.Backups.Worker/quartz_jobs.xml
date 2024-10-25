@@ -21,7 +21,7 @@
 			<job-data-map>
 				<entry>
 					<key>ConnectionString</key>
-					<value>Data Source=.\sql2;Initial Catalog=prod.Assets;Integrated Security=True;MultipleActiveResultSets=true;</value>
+					<value>Data Source=.\sql2;Initial Catalog=prod.Assets;Integrated Security=True;MultipleActiveResultSets=true;TrustServerCertificate=True</value>
 				</entry>
 				<entry>
 					<key>BackupsDirectory</key>
@@ -41,6 +41,37 @@
 				<job-group>BackupAssetsDb</job-group>
 				<start-time-seconds-in-future>10</start-time-seconds-in-future>				
 			</simple>
-		</trigger>		
+		</trigger>
+		<job>
+			<name>AssetsDbBackupCleanupJob</name>
+			<group>BackupCleanupGroup</group>
+			<description>Old backups cleanup job</description>
+			<job-type>VRT.Backups.Cleanup.BackupCleanupJob, VRT.Backups.Cleanup</job-type>
+			<durable>true</durable>
+			<recover>true</recover>
+			<job-data-map>
+				<entry>
+					<key>BackupsDirectoryPath</key>
+					<value>d:\Backups\TestDb\DailyBackups</value>
+				</entry>
+				<entry>
+					<key>SearchPattern</key>
+					<value>*.bak</value>
+				</entry>
+				<entry>
+					<key>RetentionDays</key>
+					<value>100</value>
+				</entry>
+			</job-data-map>
+		</job>
+		<trigger>
+			<simple>
+				<name>CleanupNowTrigger</name>
+				<group>CleanupNowTrigger</group>
+				<job-name>AssetsDbBackupCleanupJob</job-name>
+				<job-group>BackupCleanupGroup</job-group>
+				<start-time-seconds-in-future>10</start-time-seconds-in-future>
+			</simple>
+		</trigger>
 	</schedule>
 </job-scheduling-data>

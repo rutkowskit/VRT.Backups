@@ -1,5 +1,4 @@
-﻿using Ardalis.GuardClauses;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
@@ -14,7 +13,7 @@ partial class DependencyInjection
 
     private static ILoggingBuilder AddSerilogFromConfig(this ILoggingBuilder builder)
     {
-        Guard.Against.Null(builder);
+        ArgumentNullException.ThrowIfNull(builder);
 
         builder.Services.AddSingleton<ILoggerProvider, SerilogLoggerProvider>(services =>
         {
